@@ -1,0 +1,18 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+# SharpDevelop 4.4
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestKit", "TestKit\TestKit.csproj", "{6CE59898-0042-429D-AC0D-3C84AC193AC8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6CE59898-0042-429D-AC0D-3C84AC193AC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CE59898-0042-429D-AC0D-3C84AC193AC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CE59898-0042-429D-AC0D-3C84AC193AC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CE59898-0042-429D-AC0D-3C84AC193AC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+EndGlobal
