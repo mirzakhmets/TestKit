@@ -1,4 +1,6 @@
 ﻿
+#define TRIAL
+
 using System;
 using System.Collections;
 using System.ComponentModel;
@@ -7,6 +9,10 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+
+#if TRIAL
+using Microsoft.Win32;
+#endif
 
 namespace TestKit
 {
@@ -24,6 +30,49 @@ namespace TestKit
     private TabControl tabControl;
     private FolderBrowserDialog folderBrowserDialog;
 
+    #if TRIAL
+    public void CheckRuns() {
+		try {
+			RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\OVG-Developers", true);
+			
+			int runs = -1;
+			
+			if (key != null && key.GetValue("Runs") != null) {
+				runs = (int) key.GetValue("Runs");
+			} else {
+				key = Registry.CurrentUser.CreateSubKey("Software\\OVG-Developers");
+			}
+			
+			runs = runs + 1;
+			
+			key.SetValue("Runs", runs);
+			
+			if (runs > 30) {
+				System.Windows.Forms.MessageBox.Show("Number of runs expired.\n"
+							+ "Please register the application (visit https://ovg-developers.mystrikingly.com/ for purchase).");
+				
+				Environment.Exit(0);
+			}
+		} catch (Exception e) {
+			Console.WriteLine(e.Message);
+		}
+	}
+	
+	public bool IsRegistered() {
+		try {
+			RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\OVG-Developers");
+			
+			if (key != null && key.GetValue("Registered") != null) {
+				return true;
+			}
+		} catch (Exception e) {
+			Console.WriteLine(e.Message);
+		}
+		
+		return false;
+	}
+    #endif
+    
     public MainForm() {
     	this.InitializeComponent();
     }
@@ -98,96 +147,146 @@ namespace TestKit
 
     private void InitializeComponent()
     {
-      ComponentResourceManager resources = new ComponentResourceManager(typeof (MainForm));
-      this.folderBrowserDialog = new FolderBrowserDialog();
-      this.tabControl = new TabControl();
-      this.tabPageMain = new TabPage();
-      this.buttonGenerate = new Button();
-      this.buttonPath = new Button();
-      this.textBoxPath = new TextBox();
-      this.labelPath = new Label();
-      this.richTextBoxMain = new RichTextBox();
-      this.tabPageTest = new TabPage();
-      this.webBrowser = new WebBrowser();
-      this.tabControl.SuspendLayout();
-      this.tabPageMain.SuspendLayout();
-      this.tabPageTest.SuspendLayout();
-      this.SuspendLayout();
-      this.tabControl.Controls.Add((Control) this.tabPageMain);
-      this.tabControl.Controls.Add((Control) this.tabPageTest);
-      this.tabControl.Location = new Point(1, 3);
-      this.tabControl.Name = "tabControl";
-      this.tabControl.SelectedIndex = 0;
-      this.tabControl.Size = new Size(548, 324);
-      this.tabControl.TabIndex = 0;
-      this.tabPageMain.Controls.Add((Control) this.buttonGenerate);
-      this.tabPageMain.Controls.Add((Control) this.buttonPath);
-      this.tabPageMain.Controls.Add((Control) this.textBoxPath);
-      this.tabPageMain.Controls.Add((Control) this.labelPath);
-      this.tabPageMain.Controls.Add((Control) this.richTextBoxMain);
-      this.tabPageMain.Location = new Point(4, 22);
-      this.tabPageMain.Name = "tabPageMain";
-      this.tabPageMain.Padding = new Padding(3);
-      this.tabPageMain.Size = new Size(540, 298);
-      this.tabPageMain.TabIndex = 0;
-      this.tabPageMain.Text = "Main";
-      this.tabPageMain.UseVisualStyleBackColor = true;
-      this.buttonGenerate.Location = new Point(227, 269);
-      this.buttonGenerate.Name = "buttonGenerate";
-      this.buttonGenerate.Size = new Size(75, 23);
-      this.buttonGenerate.TabIndex = 4;
-      this.buttonGenerate.Text = "Generate";
-      this.buttonGenerate.UseVisualStyleBackColor = true;
-      this.buttonGenerate.Click += new EventHandler(this.ButtonGenerateClick);
-      this.buttonPath.Location = new Point(493, 24);
-      this.buttonPath.Name = "buttonPath";
-      this.buttonPath.Size = new Size(39, 20);
-      this.buttonPath.TabIndex = 3;
-      this.buttonPath.Text = "...";
-      this.buttonPath.UseVisualStyleBackColor = true;
-      this.buttonPath.Click += new EventHandler(this.ButtonPathClick);
-      this.textBoxPath.Location = new Point(6, 24);
-      this.textBoxPath.Name = "textBoxPath";
-      this.textBoxPath.Size = new Size(481, 20);
-      this.textBoxPath.TabIndex = 2;
-      this.labelPath.Location = new Point(6, 3);
-      this.labelPath.Name = "labelPath";
-      this.labelPath.Size = new Size(113, 16);
-      this.labelPath.TabIndex = 1;
-      this.labelPath.Text = "Path:";
-      this.richTextBoxMain.Location = new Point(7, 48);
-      this.richTextBoxMain.Name = "richTextBoxMain";
-      this.richTextBoxMain.Size = new Size(525, 220);
-      this.richTextBoxMain.TabIndex = 0;
-      this.richTextBoxMain.Text = "1+2 = ?:\n1;\n2;\n+3;\n4.\n\n1+3=?:\n1;\n2;\n3;\n+4.";
-      this.tabPageTest.Controls.Add((Control) this.webBrowser);
-      this.tabPageTest.Location = new Point(4, 22);
-      this.tabPageTest.Name = "tabPageTest";
-      this.tabPageTest.Padding = new Padding(3);
-      this.tabPageTest.Size = new Size(540, 298);
-      this.tabPageTest.TabIndex = 1;
-      this.tabPageTest.Text = "Test";
-      this.tabPageTest.UseVisualStyleBackColor = true;
-      this.webBrowser.Dock = DockStyle.Fill;
-      this.webBrowser.Location = new Point(3, 3);
-      this.webBrowser.MinimumSize = new Size(20, 20);
-      this.webBrowser.Name = "webBrowser";
-      this.webBrowser.Size = new Size(534, 292);
-      this.webBrowser.TabIndex = 0;
-      this.AutoScaleDimensions = new SizeF(6f, 13f);
-      this.AutoScaleMode = AutoScaleMode.Font;
-      this.ClientSize = new Size(549, 326);
-      this.Controls.Add((Control) this.tabControl);
-      this.Icon = (Icon) resources.GetObject("$this.Icon");
-      this.MaximizeBox = false;
-      this.MinimizeBox = false;
-      this.Name = "MainForm";
-      this.Text = "TestKit";
-      this.tabControl.ResumeLayout(false);
-      this.tabPageMain.ResumeLayout(false);
-      this.tabPageMain.PerformLayout();
-      this.tabPageTest.ResumeLayout(false);
-      this.ResumeLayout(false);
+    	System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
+    	this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
+    	this.tabControl = new System.Windows.Forms.TabControl();
+    	this.tabPageMain = new System.Windows.Forms.TabPage();
+    	this.buttonGenerate = new System.Windows.Forms.Button();
+    	this.buttonPath = new System.Windows.Forms.Button();
+    	this.textBoxPath = new System.Windows.Forms.TextBox();
+    	this.labelPath = new System.Windows.Forms.Label();
+    	this.richTextBoxMain = new System.Windows.Forms.RichTextBox();
+    	this.tabPageTest = new System.Windows.Forms.TabPage();
+    	this.webBrowser = new System.Windows.Forms.WebBrowser();
+    	this.tabControl.SuspendLayout();
+    	this.tabPageMain.SuspendLayout();
+    	this.tabPageTest.SuspendLayout();
+    	this.SuspendLayout();
+    	// 
+    	// tabControl
+    	// 
+    	this.tabControl.Controls.Add(this.tabPageMain);
+    	this.tabControl.Controls.Add(this.tabPageTest);
+    	this.tabControl.Location = new System.Drawing.Point(1, 4);
+    	this.tabControl.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+    	this.tabControl.Name = "tabControl";
+    	this.tabControl.SelectedIndex = 0;
+    	this.tabControl.Size = new System.Drawing.Size(731, 399);
+    	this.tabControl.TabIndex = 0;
+    	// 
+    	// tabPageMain
+    	// 
+    	this.tabPageMain.Controls.Add(this.buttonGenerate);
+    	this.tabPageMain.Controls.Add(this.buttonPath);
+    	this.tabPageMain.Controls.Add(this.textBoxPath);
+    	this.tabPageMain.Controls.Add(this.labelPath);
+    	this.tabPageMain.Controls.Add(this.richTextBoxMain);
+    	this.tabPageMain.Location = new System.Drawing.Point(4, 25);
+    	this.tabPageMain.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+    	this.tabPageMain.Name = "tabPageMain";
+    	this.tabPageMain.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+    	this.tabPageMain.Size = new System.Drawing.Size(723, 370);
+    	this.tabPageMain.TabIndex = 0;
+    	this.tabPageMain.Text = "Main";
+    	this.tabPageMain.UseVisualStyleBackColor = true;
+    	// 
+    	// buttonGenerate
+    	// 
+    	this.buttonGenerate.Location = new System.Drawing.Point(303, 331);
+    	this.buttonGenerate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+    	this.buttonGenerate.Name = "buttonGenerate";
+    	this.buttonGenerate.Size = new System.Drawing.Size(100, 28);
+    	this.buttonGenerate.TabIndex = 4;
+    	this.buttonGenerate.Text = "Generate";
+    	this.buttonGenerate.UseVisualStyleBackColor = true;
+    	this.buttonGenerate.Click += new System.EventHandler(this.ButtonGenerateClick);
+    	// 
+    	// buttonPath
+    	// 
+    	this.buttonPath.Location = new System.Drawing.Point(657, 30);
+    	this.buttonPath.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+    	this.buttonPath.Name = "buttonPath";
+    	this.buttonPath.Size = new System.Drawing.Size(52, 25);
+    	this.buttonPath.TabIndex = 3;
+    	this.buttonPath.Text = "...";
+    	this.buttonPath.UseVisualStyleBackColor = true;
+    	this.buttonPath.Click += new System.EventHandler(this.ButtonPathClick);
+    	// 
+    	// textBoxPath
+    	// 
+    	this.textBoxPath.Location = new System.Drawing.Point(8, 30);
+    	this.textBoxPath.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+    	this.textBoxPath.Name = "textBoxPath";
+    	this.textBoxPath.Size = new System.Drawing.Size(640, 22);
+    	this.textBoxPath.TabIndex = 2;
+    	// 
+    	// labelPath
+    	// 
+    	this.labelPath.Location = new System.Drawing.Point(8, 4);
+    	this.labelPath.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+    	this.labelPath.Name = "labelPath";
+    	this.labelPath.Size = new System.Drawing.Size(151, 20);
+    	this.labelPath.TabIndex = 1;
+    	this.labelPath.Text = "Path:";
+    	// 
+    	// richTextBoxMain
+    	// 
+    	this.richTextBoxMain.Location = new System.Drawing.Point(9, 59);
+    	this.richTextBoxMain.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+    	this.richTextBoxMain.Name = "richTextBoxMain";
+    	this.richTextBoxMain.Size = new System.Drawing.Size(699, 270);
+    	this.richTextBoxMain.TabIndex = 0;
+    	this.richTextBoxMain.Text = "1+2 = ?:\n1;\n2;\n+3;\n4.\n\n1+3=?:\n1;\n2;\n3;\n+4.";
+    	// 
+    	// tabPageTest
+    	// 
+    	this.tabPageTest.Controls.Add(this.webBrowser);
+    	this.tabPageTest.Location = new System.Drawing.Point(4, 25);
+    	this.tabPageTest.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+    	this.tabPageTest.Name = "tabPageTest";
+    	this.tabPageTest.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+    	this.tabPageTest.Size = new System.Drawing.Size(723, 370);
+    	this.tabPageTest.TabIndex = 1;
+    	this.tabPageTest.Text = "Test";
+    	this.tabPageTest.UseVisualStyleBackColor = true;
+    	// 
+    	// webBrowser
+    	// 
+    	this.webBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
+    	this.webBrowser.Location = new System.Drawing.Point(4, 4);
+    	this.webBrowser.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+    	this.webBrowser.MinimumSize = new System.Drawing.Size(27, 25);
+    	this.webBrowser.Name = "webBrowser";
+    	this.webBrowser.Size = new System.Drawing.Size(715, 362);
+    	this.webBrowser.TabIndex = 0;
+    	// 
+    	// MainForm
+    	// 
+    	this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+    	this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+    	this.ClientSize = new System.Drawing.Size(732, 401);
+    	this.Controls.Add(this.tabControl);
+    	this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+    	this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+    	this.MaximizeBox = false;
+    	this.MinimizeBox = false;
+    	this.Name = "MainForm";
+    	this.Text = "TestKit";
+    	this.Shown += new System.EventHandler(this.MainFormShown);
+    	this.tabControl.ResumeLayout(false);
+    	this.tabPageMain.ResumeLayout(false);
+    	this.tabPageMain.PerformLayout();
+    	this.tabPageTest.ResumeLayout(false);
+    	this.ResumeLayout(false);
+
     }
+		void MainFormShown(object sender, EventArgs e)
+		{
+			#if TRIAL
+	      	if (!IsRegistered()) {
+	    		CheckRuns();
+	    	}
+	    	#endif
+		}
   }
 }
